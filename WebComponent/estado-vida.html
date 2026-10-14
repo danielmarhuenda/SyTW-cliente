@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba del ciclo de vida de Web Components</title>
+</head>
+<body>
+    <h1>Ciclo de vida de un Web Component</h1>
+
+    <p>Abre la consola del navegador (F12) para ver los mensajes.</p>
+
+    <button id="adjuntar">Adjuntar al DOM</button>
+    <button id="separar">Separar del DOM</button>
+    <button id="cambiar">Cambiar atributo</button>
+
+    <div id="contenedor">
+        <mi-componente mensaje="Hola"></mi-componente>
+    </div>
+
+    <script>
+        class MiComponente extends HTMLElement {
+            static get observedAttributes() {
+                return ["mensaje"];
+            }
+
+            constructor() {
+                super();
+                console.log("Creado: constructor()");
+            }
+
+            connectedCallback() {
+                console.log("Adjuntado al DOM: connectedCallback()");
+            }
+
+            disconnectedCallback() {
+                console.log("Separado del DOM: disconnectedCallback()");
+            }
+
+            attributeChangedCallback(nombre, valorAnterior, valorNuevo) {
+                console.log(
+                    "Cambio en los atributos: attributeChangedCallback()",
+                    {
+                        atributo: nombre,
+                        valorAnterior: valorAnterior,
+                        valorNuevo: valorNuevo
+                    }
+                );
+            }
+        }
+
+        customElements.define("mi-componente", MiComponente);
+
+        const contenedor = document.getElementById("contenedor");
+        const componente = document.querySelector("mi-componente");
+
+        document.getElementById("adjuntar").addEventListener("click", () => {
+            if (!componente.isConnected) {
+                contenedor.appendChild(componente);
+            }
+        });
+
+        document.getElementById("separar").addEventListener("click", () => {
+            if (componente.isConnected) {
+                componente.remove();
+            }
+        });
+
+        document.getElementById("cambiar").addEventListener("click", () => {
+            const mensajeActual = componente.getAttribute("mensaje");
+
+            componente.setAttribute(
+                "mensaje",
+                mensajeActual === "Hola" ? "Adiós" : "Hola"
+            );
+        });
+    </script>
+</body>
+</html>
